@@ -36,7 +36,7 @@ class LayersService extends AbstractService {
       // CompatibleArchitecture: this.plugin.settings.compatibleArchitectures
     };
 
-    if (Marker) {
+    if (marker) {
       params.Marker = marker;
     }
 
@@ -56,7 +56,7 @@ class LayersService extends AbstractService {
 
   async checkLayersForVersionKey (versionKey) {
     this.plugin.log('Looking for version with...', versionKey);
-    const layerVersionArn = await this.findVersionChecksumInList(versionKey, marker);
+    const layerVersionArn = await this.findVersionChecksumInList(versionKey);
 
     if (layerVersionArn) {
       return layerVersionArn;
