@@ -7,7 +7,7 @@ const python = require('./python');
 class Runtimes {
   constructor(plugin) {
     this.plugin = plugin;
-    this.compatibleArchitectures = ["x86_64","arm64"];
+    this.compatibleArchitectures = ["x86_64", "arm64"];
 
     const { runtime } = this.plugin.service.provider;
 
@@ -44,11 +44,11 @@ class Runtimes {
       });
   }
 
-  init() {
+  init () {
     this._runtime.init();
   }
 
-  run(cmd) {
+  run (cmd) {
     return new Promise((resolve, reject) => {
       exec(cmd, (err, stdout, out) => {
         if (err) return reject(err);
@@ -57,7 +57,7 @@ class Runtimes {
     });
   }
 
-  getDefaultSettings(inboundSettings = {}) {
+  getDefaultSettings (inboundSettings = {}) {
     if (inboundSettings.packagePath) {
       console.warn('WARN You should use "dependenciesPath" instead of the deprecated "packagePath" param.');
       inboundSettings.dependenciesPath = inboundSettings.packagePath;
@@ -65,12 +65,16 @@ class Runtimes {
     return { ...this._runtime.default, ...inboundSettings };
   }
 
-  getCommands() {
+  getCommands () {
     return this._runtime.commands;
   }
 
-  hasDependenciesChanges() {
+  hasDependenciesChanges () {
     return this._runtime.hasDependenciesChanges();
+  }
+
+  getDependenciesChecksum () {
+    return this._runtime.getDependenciesChecksum();
   }
 }
 

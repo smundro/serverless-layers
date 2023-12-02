@@ -2,17 +2,18 @@ const AbstractService = require('../AbstractService');
 
 class LayersService extends AbstractService {
 
-  descriptionWithChecksum (checksum) {
-    return 'created by serverless-layers plugin (' + checksum + ')'
+  descriptionWithVersionKey (versionKey) {
+    return 'created by serverless-layers plugin (' + versionKey + ')'
   }
-  async publishVersion (checksum) {
+
+  async publishVersion (versionKey) {
     const params = {
       Content: {
         S3Bucket: this.bucketName,
         S3Key: this.zipFileKeyName
       },
       LayerName: this.layerName,
-      Description: this.descriptionWithChecksum(checksum),
+      Description: this.descriptionWithVersionKey(versionKey),
 
       CompatibleRuntimes: this.plugin.settings.compatibleRuntimes,
       CompatibleArchitectures: this.plugin.settings.compatibleArchitectures
@@ -26,11 +27,13 @@ class LayersService extends AbstractService {
       });
   }
 
-  async findVersionChecksumInList (checksum, marker) {
+
+  async findVersionChecksumInList (versionKey, marker) {
     const params = {
       LayerName: this.layerName,
-      CompatibleRuntimes: this.plugin.settings.compatibleRuntimes,
-      CompatibleArchitectures: this.plugin.settings.compatibleArchitectures
+      // Question: is layer name specific enough?  Is there a way to deploy multiple runtime architectures per name?
+      // CompatibleRuntime: this.plugin.settings.compatibleRuntimes,
+      // CompatibleArchitecture: this.plugin.settings.compatibleArchitectures
     };
 
     if (Marker) {
@@ -38,32 +41,32 @@ class LayersService extends AbstractService {
     }
 
     const result = await this.awsRequest('Lambda:listLayerVersions', params, { checkError: true });
-    this.plugin.log('Layers returned...');
-    console.log(result);
 
-    const description = this.descriptionWithChecksum(checksum);
+    const description = this.descriptionWithVersionKey(versionKey);
 
     const matchingLayerVersion = result.LayerVersions.find((layer) => layer.Description === description);
     if (matchingLayerVersion) {
       return matchingLayerVersion.LayerVersionArn;
     } else if (result.NextMarker) {
-      return this.findVersionChecksumInList(checksum, result.NextMarker);
+      return this.findVersionChecksumInList(versionKey, result.NextMarker);
     } else {
       return null;
     }
   }
 
-  async checkLayersForChecksum (checksum) {
-    this.plugin.log('Looking for version with...', checksum);
-    const layerVersionArn = await this.findVersionChecksumInList(checksum, marker);
+  async checkLayersForVersionKey (versionKey) {
+    this.plugin.log('Looking for version with...', versionKey);
+    const layerVersionArn = await this.findVersionChecksumInList(versionKey, marker);
 
     if (layerVersionArn) {
-      const params = { arn: layerVersionArn }
-      const matchingLayerWithContent = await this.awsRequest('Lambda:getLayerVersionByArn', params, { checkError: true });
-      if (matchingLayerWithContent) {
-        this.plugin.log('Matching layer found...', matchingLayerWithContent.Content.CodeSha256);
-        return matchingLayerWithContent.LayerVersionArn;
-      }
+      return layerVersionArn;
+      // TODO: check if layer content is the same
+      //   const params = { arn: layerVersionArn }
+      //   const matchingLayerWithContent = await this.awsRequest('Lambda:getLayerVersionByArn', params, { checkError: true });
+      //   if (matchingLayerWithContent) {
+      //     this.plugin.log('Matching layer found...', matchingLayerWithContent.Content.CodeSha256);
+      //     return matchingLayerWithContent.LayerVersionArn;
+      //   }
     }
   }
 

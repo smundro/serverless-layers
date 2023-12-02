@@ -1,4 +1,5 @@
 const path = require('path');
+const crypto = require('crypto');
 
 class NodeJSRuntime {
   constructor(parent, runtime, runtimeDir) {

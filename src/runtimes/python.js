@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 class PythonRuntime {
   constructor(parent, runtime, runtimeDir) {
@@ -10,7 +11,7 @@ class PythonRuntime {
       runtime,
       runtimeDir,
       libraryFolder: 'site-packages',
-      packageManager:  'pip',
+      packageManager: 'pip',
       packageManagerExtraArgs: '',
       dependenciesPath: 'requirements.txt',
       compatibleRuntimes: [runtime],
@@ -34,7 +35,7 @@ class PythonRuntime {
     };
   }
 
-  init() {
+  init () {
     const { dependenciesPath } = this.plugin.settings;
 
     const localpackageJson = path.join(
@@ -50,7 +51,7 @@ class PythonRuntime {
     }
   }
 
-  async isCompatibleVersion(runtime) {
+  async isCompatibleVersion (runtime) {
     const osVersion = await this.parent.run('python --version');
     const [runtimeVersion] = runtime.match(/[0-9].[0-9]/);
     return {
@@ -59,14 +60,14 @@ class PythonRuntime {
     };
   }
 
-  isDiff(depsA, depsB) {
+  isDiff (depsA, depsB) {
     if (!depsA) {
       return true;
     }
     return depsA !== depsB;
   }
 
-  async hasDependenciesChanges() {
+  async hasDependenciesChanges () {
     const remotePackage = await this.plugin.bucketService.downloadDependencesFile();
 
     let isDifferent = true;
@@ -77,6 +78,14 @@ class PythonRuntime {
     }
 
     return isDifferent;
+  }
+
+  async getDependenciesChecksum () {
+    return new Promise(function (resolve, reject) {
+      const hash = crypto.createHash('md5');
+      hash.update(this.localPackage);
+      resolve(hash.digest('hex'));
+    });
   }
 }
 

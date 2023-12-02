@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-
+const crypto = require('crypto');
 
 class RubyRuntime {
   constructor(parent, runtime, runtimeDir) {
@@ -11,7 +11,7 @@ class RubyRuntime {
       runtime,
       runtimeDir,
       libraryFolder: 'gems',
-      packageManager:  'bundle',
+      packageManager: 'bundle',
       packageManagerExtraArgs: '',
       dependenciesPath: 'Gemfile',
       compatibleRuntimes: [runtime],
@@ -42,7 +42,7 @@ class RubyRuntime {
     };
   }
 
-  init() {
+  init () {
     const { dependenciesPath } = this.plugin.settings;
 
     const localpackageJson = path.join(
@@ -58,7 +58,7 @@ class RubyRuntime {
     }
   }
 
-  async isCompatibleVersion(runtime) {
+  async isCompatibleVersion (runtime) {
     const osVersion = await this.parent.run('ruby --version');
     const [runtimeVersion] = runtime.match(/[0-9].[0-9]/);
     return {
@@ -67,14 +67,14 @@ class RubyRuntime {
     };
   }
 
-  isDiff(depsA, depsB) {
+  isDiff (depsA, depsB) {
     if (!depsA) {
       return true;
     }
     return depsA !== depsB;
   }
 
-  async hasDependenciesChanges() {
+  async hasDependenciesChanges () {
     const remotePackage = await this.plugin.bucketService.downloadDependencesFile();
 
     let isDifferent = true;
@@ -85,6 +85,14 @@ class RubyRuntime {
     }
 
     return isDifferent;
+  }
+
+  async getDependenciesChecksum () {
+    return new Promise(function (resolve, reject) {
+      const hash = crypto.createHash('md5');
+      hash.update(this.localPackage);
+      resolve(hash.digest('hex'));
+    });
   }
 }
 

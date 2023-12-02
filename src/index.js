@@ -309,13 +309,17 @@ class ServerlessLayers {
     // merge package default options
     this.mergePackageOptions();
 
-    // If nothing has changed, confirm layer with same checksum
     let existentLayerArn = '';
-    const depChecksum = await this.runtimes.getDependenciesChecksum();
+    const versionKey =
+      (await this.runtimes.getDependenciesChecksum()) +
+      (this.settings.customHash ? '.' + this.settings.customHash : '');
+
+    // If nothing has changed, confirm layer with same checksum
     if (!verifyChanges) {
       this.log('Checking if layer already exists...')
-      existentLayerArn = await this.layersService.checkLayersForChecksum(depChecksum);
-
+      existentLayerArn = await this.layersService.checkLayersForVersionKey(versionKey);
+    } else {
+      this.log('has changes, so not checking for layer...')
     }
 
     // It improves readability
@@ -344,7 +348,7 @@ class ServerlessLayers {
 
     await this.zipService.package();
     await this.bucketService.uploadZipFile();
-    const version = await this.layersService.publishVersion(depChecksum);
+    const version = await this.layersService.publishVersion(versionKey);
     await this.bucketService.putFile(this.dependencies.getDepsPath());
 
     this.relateLayerWithFunctions(version.LayerVersionArn);
