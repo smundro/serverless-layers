@@ -310,9 +310,13 @@ class ServerlessLayers {
     this.mergePackageOptions();
 
     // If nothing has changed, confirm layer with same checksum
-    const existentLayerArn = !verifyChanges
-      ? await this.layersService.checkLayersForChecksum(await this.zipService.getChecksum(artifact))
-      : ''
+    let existentLayerArn = '';
+    const depChecksum = await this.runtimes.getDependenciesChecksum();
+    if (!verifyChanges) {
+      this.log('Checking if layer already exists...')
+      existentLayerArn = await this.layersService.checkLayersForChecksum(depChecksum);
+
+    }
 
     // It improves readability
     const skipInstallation = (
@@ -340,7 +344,7 @@ class ServerlessLayers {
 
     await this.zipService.package();
     await this.bucketService.uploadZipFile();
-    const version = await this.layersService.publishVersion();
+    const version = await this.layersService.publishVersion(depChecksum);
     await this.bucketService.putFile(this.dependencies.getDepsPath());
 
     this.relateLayerWithFunctions(version.LayerVersionArn);

@@ -9,7 +9,7 @@ class NodeJSRuntime {
       runtime,
       runtimeDir,
       libraryFolder: 'node_modules',
-      packageManager:  'npm',
+      packageManager: 'npm',
       packageManagerExtraArgs: '',
       dependenciesPath: 'package.json',
       compatibleRuntimes: [runtimeDir],
@@ -64,7 +64,7 @@ class NodeJSRuntime {
     };
   }
 
-  init() {
+  init () {
     const { dependenciesPath } = this.plugin.settings;
 
     const localpackageJson = path.join(
@@ -80,7 +80,7 @@ class NodeJSRuntime {
     }
   }
 
-  async isCompatibleVersion(runtime) {
+  async isCompatibleVersion (runtime) {
     const osVersion = await this.parent.run('node --version');
     const [runtimeVersion] = runtime.match(/([0-9]+)\./);
     return {
@@ -89,7 +89,7 @@ class NodeJSRuntime {
     };
   }
 
-  isDiff(depsA, depsB) {
+  isDiff (depsA, depsB) {
     if (!depsA) {
       return true;
     }
@@ -110,7 +110,7 @@ class NodeJSRuntime {
     return hasDifference;
   }
 
-  async hasDependenciesChanges() {
+  async hasDependenciesChanges () {
     const remotePackage = await this.plugin.bucketService.downloadDependencesFile();
 
     let isDifferent = true;
@@ -123,6 +123,14 @@ class NodeJSRuntime {
     }
 
     return isDifferent;
+  }
+
+  async getDependenciesChecksum () {
+    return new Promise(function (resolve, reject) {
+      const hash = crypto.createHash('md5');
+      hash.update(this.localPackage.dependencies);
+      resolve(hash.digest('hex'));
+    });
   }
 }
 
