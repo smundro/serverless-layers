@@ -87,12 +87,8 @@ class RubyRuntime {
     return isDifferent;
   }
 
-  async getDependenciesChecksum () {
-    return new Promise(function (resolve, reject) {
-      const hash = crypto.createHash('md5');
-      hash.update(this.localPackage);
-      resolve(hash.digest('hex'));
-    });
+  getDependenciesChecksum () {
+    return crypto.createHash('md5').update(this.localPackage).digest('hex');
   }
 }
 

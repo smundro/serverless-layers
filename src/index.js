@@ -311,7 +311,7 @@ class ServerlessLayers {
 
     let existentLayerArn = '';
     const versionKey =
-      (await this.runtimes.getDependenciesChecksum()) +
+      (this.runtimes.getDependenciesChecksum()) +
       (this.settings.customHash ? '.' + this.settings.customHash : '');
 
     // If nothing has changed, confirm layer with same checksum

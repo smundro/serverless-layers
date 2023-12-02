@@ -126,12 +126,8 @@ class NodeJSRuntime {
     return isDifferent;
   }
 
-  async getDependenciesChecksum () {
-    return new Promise(function (resolve, reject) {
-      const hash = crypto.createHash('md5');
-      hash.update(this.localPackage.dependencies);
-      resolve(hash.digest('hex'));
-    });
+  getDependenciesChecksum () {
+    return crypto.createHash('md5').update(this.localPackage.dependencies).digest('hex');
   }
 }
 
