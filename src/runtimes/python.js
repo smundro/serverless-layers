@@ -81,7 +81,7 @@ class PythonRuntime {
   }
 
   getDependenciesChecksum () {
-    return crypto.createHash('md5').update(this.localPackage).digest('hex');
+    return crypto.createHash('md5').update(JSON.stringify(this.localPackage)).digest('hex');
   }
 }
 

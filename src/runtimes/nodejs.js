@@ -127,7 +127,7 @@ class NodeJSRuntime {
   }
 
   getDependenciesChecksum () {
-    return crypto.createHash('md5').update(this.localPackage.dependencies).digest('hex');
+    return crypto.createHash('md5').update(JSON.stringify(this.localPackage.dependencies)).digest('hex');
   }
 }
 
