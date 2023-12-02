@@ -55,7 +55,7 @@ class LayersService extends AbstractService {
   }
 
   async checkLayersForVersionKey (versionKey) {
-    this.plugin.log('Looking for version with...', versionKey);
+    this.plugin.log('Looking for version with "' + versionKey + '"');
     const layerVersionArn = await this.findVersionChecksumInList(versionKey);
 
     if (layerVersionArn) {
