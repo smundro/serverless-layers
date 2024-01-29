@@ -25,7 +25,7 @@ class NodeJSRuntime {
       ],
       layerOptimization: {
         cleanupPatterns: [
-          "node_modules/aws-sdk/**",
+          // "node_modules/aws-sdk/**", include for node 18, temporarily
           "node_modules/**/.github",
           "node_modules/**/.git/*",
           "node_modules/**/.lint",
@@ -65,7 +65,7 @@ class NodeJSRuntime {
     };
   }
 
-  init () {
+  init() {
     const { dependenciesPath } = this.plugin.settings;
 
     const localpackageJson = path.join(
@@ -81,7 +81,7 @@ class NodeJSRuntime {
     }
   }
 
-  async isCompatibleVersion (runtime) {
+  async isCompatibleVersion(runtime) {
     const osVersion = await this.parent.run('node --version');
     const [runtimeVersion] = runtime.match(/([0-9]+)\./);
     return {
@@ -90,7 +90,7 @@ class NodeJSRuntime {
     };
   }
 
-  isDiff (depsA, depsB) {
+  isDiff(depsA, depsB) {
     if (!depsA) {
       return true;
     }
@@ -111,7 +111,7 @@ class NodeJSRuntime {
     return hasDifference;
   }
 
-  async hasDependenciesChanges () {
+  async hasDependenciesChanges() {
     const remotePackage = await this.plugin.bucketService.downloadDependencesFile();
 
     let isDifferent = true;
@@ -126,7 +126,7 @@ class NodeJSRuntime {
     return isDifferent;
   }
 
-  getDependenciesChecksum () {
+  getDependenciesChecksum() {
     return crypto.createHash('md5').update(JSON.stringify(this.localPackage.dependencies)).digest('hex');
   }
 }

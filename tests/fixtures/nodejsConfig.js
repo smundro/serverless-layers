@@ -7,7 +7,7 @@ module.exports = {
   dependenciesPath: './fixtures/package.json',
   layerOptimization: {
     cleanupPatterns: [
-      "node_modules/aws-sdk/**",
+      // "node_modules/aws-sdk/**", include for node 18, temporarily
       "node_modules/**/.github",
       "node_modules/**/.git/*",
       "node_modules/**/.lint",
@@ -38,11 +38,11 @@ module.exports = {
       "node_modules/**/*.md"
     ]
   },
-  compatibleRuntimes: [ 'nodejs' ],
+  compatibleRuntimes: ['nodejs'],
   compatibleArchitectures: [
     "x86_64",
     "arm64"
   ],
-  copyBeforeInstall: [ '.npmrc', 'yarn.lock', 'package-lock.json' ],
-  packagePatterns: [ '!node_modules/**' ]
+  copyBeforeInstall: ['.npmrc', 'yarn.lock', 'package-lock.json'],
+  packagePatterns: ['!node_modules/**']
 }
