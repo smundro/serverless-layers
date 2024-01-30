@@ -26,6 +26,8 @@ class NodeJSRuntime {
       layerOptimization: {
         cleanupPatterns: [
           "node_modules/@aws-sdk/**", // if using node 18 packages that use @aws-sdk
+          "node_modules/@aws-crypto/**", // if using node 18 packages that use @aws-sdk
+          "node_modules/@smithy/**", // if using node 18 packages that use @aws-sdk
           "node_modules/aws-sdk/**",  // if using node 18, exclude from cleanup to continue using
           "node_modules/**/.github",
           "node_modules/**/.git/*",
