@@ -7,7 +7,8 @@ module.exports = {
   dependenciesPath: './fixtures/package.json',
   layerOptimization: {
     cleanupPatterns: [
-      // "node_modules/aws-sdk/**", include for node 18, temporarily
+      "node_modules/@aws-sdk/**", // if using node 18 packages that use @aws-sdk
+      "node_modules/aws-sdk/**",  // if using node 18, exclude from cleanup to continue using
       "node_modules/**/.github",
       "node_modules/**/.git/*",
       "node_modules/**/.lint",
