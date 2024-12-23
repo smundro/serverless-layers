@@ -19,10 +19,11 @@ class NodeJSRuntime {
       packagePatterns: ["!node_modules/**"],
       layerOptimization: {
         cleanupPatterns: [
-          // "node_modules/@aws-sdk/**", // if using node 18 packages that use @aws-sdk
-          // "node_modules/@aws-crypto/**", // if using node 18 packages that use @aws-sdk
-          // "node_modules/@smithy/**", // if using node 18 packages that use @aws-sdk
-          // "node_modules/aws-sdk/**",  // if using node 18, exclude from cleanup to continue using
+          // exclude all the @aws-sdk packages, in case some package has pulled them in
+          "node_modules/@aws-sdk/**", // if using node 18 packages that use @aws-sdk
+          "node_modules/@aws-crypto/**", // if using node 18 packages that use @aws-sdk
+          "node_modules/@smithy/**", // if using node 18 packages that use @aws-sdk
+          // "node_modules/aws-sdk/**", // Don't exclude aws-sdk, in case a package needs it for node18
           "node_modules/**/.github",
           "node_modules/**/.git/*",
           "node_modules/**/.lint",
