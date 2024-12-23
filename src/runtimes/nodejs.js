@@ -1,5 +1,5 @@
-const path = require('path');
-const crypto = require('crypto');
+const path = require("path");
+const crypto = require("crypto");
 
 class NodeJSRuntime {
   constructor(parent, runtime, runtimeDir) {
@@ -9,26 +9,21 @@ class NodeJSRuntime {
     this.default = {
       runtime,
       runtimeDir,
-      libraryFolder: 'node_modules',
-      packageManager: 'npm',
-      packageManagerExtraArgs: '',
-      dependenciesPath: 'package.json',
+      libraryFolder: "node_modules",
+      packageManager: "npm",
+      packageManagerExtraArgs: "",
+      dependenciesPath: "package.json",
       compatibleRuntimes: [runtimeDir],
       compatibleArchitectures: parent.compatibleArchitectures,
-      copyBeforeInstall: [
-        '.npmrc',
-        'yarn.lock',
-        'package-lock.json'
-      ],
-      packagePatterns: [
-        '!node_modules/**',
-      ],
+      copyBeforeInstall: [".npmrc", "yarn.lock", "package-lock.json"],
+      packagePatterns: ["!node_modules/**"],
       layerOptimization: {
         cleanupPatterns: [
+          // exclude all the @aws-sdk packages, in case some package has pulled them in
           "node_modules/@aws-sdk/**", // if using node 18 packages that use @aws-sdk
           "node_modules/@aws-crypto/**", // if using node 18 packages that use @aws-sdk
           "node_modules/@smithy/**", // if using node 18 packages that use @aws-sdk
-          "node_modules/aws-sdk/**",  // if using node 18, exclude from cleanup to continue using
+          // "node_modules/aws-sdk/**", // Don't exclude aws-sdk, in case a package needs it for node18
           "node_modules/**/.github",
           "node_modules/**/.git/*",
           "node_modules/**/.lint",
@@ -57,24 +52,21 @@ class NodeJSRuntime {
           "node_modules/**/yarn.lock",
           "node_modules/**/.package-lock.json",
           "node_modules/**/*.md",
-        ]
-      }
+        ],
+      },
     };
 
     this.commands = {
-      npm: 'npm install --production --only=prod',
-      yarn: 'yarn --production',
-      pnpm: 'pnpm install --prod'
+      npm: "npm install --production --only=prod",
+      yarn: "yarn --production",
+      pnpm: "pnpm install --prod",
     };
   }
 
   init() {
     const { dependenciesPath } = this.plugin.settings;
 
-    const localpackageJson = path.join(
-      process.cwd(),
-      dependenciesPath
-    );
+    const localpackageJson = path.join(process.cwd(), dependenciesPath);
 
     try {
       this.localPackage = require(localpackageJson);
@@ -85,11 +77,11 @@ class NodeJSRuntime {
   }
 
   async isCompatibleVersion(runtime) {
-    const osVersion = await this.parent.run('node --version');
+    const osVersion = await this.parent.run("node --version");
     const [runtimeVersion] = runtime.match(/([0-9]+)\./);
     return {
       version: osVersion,
-      isCompatible: osVersion.startsWith(`v${runtimeVersion}`)
+      isCompatible: osVersion.startsWith(`v${runtimeVersion}`),
     };
   }
 
@@ -105,7 +97,7 @@ class NodeJSRuntime {
     if (!isSizeEqual) return true;
 
     let hasDifference = false;
-    Object.keys(depsA).forEach(dependence => {
+    Object.keys(depsA).forEach((dependence) => {
       if (depsA[dependence] !== depsB[dependence]) {
         hasDifference = true;
       }
@@ -115,22 +107,29 @@ class NodeJSRuntime {
   }
 
   async hasDependenciesChanges() {
-    const remotePackage = await this.plugin.bucketService.downloadDependencesFile();
+    const remotePackage =
+      await this.plugin.bucketService.downloadDependencesFile();
 
     let isDifferent = true;
 
     if (remotePackage) {
       const parsedRemotePackage = JSON.parse(remotePackage);
       const { dependencies } = parsedRemotePackage;
-      this.plugin.log('Comparing package.json dependencies...');
-      isDifferent = await this.isDiff(dependencies, this.localPackage.dependencies);
+      this.plugin.log("Comparing package.json dependencies...");
+      isDifferent = await this.isDiff(
+        dependencies,
+        this.localPackage.dependencies
+      );
     }
 
     return isDifferent;
   }
 
   getDependenciesChecksum() {
-    return crypto.createHash('md5').update(JSON.stringify(this.localPackage.dependencies)).digest('hex');
+    return crypto
+      .createHash("md5")
+      .update(JSON.stringify(this.localPackage.dependencies))
+      .digest("hex");
   }
 }
 

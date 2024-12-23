@@ -1,10 +1,10 @@
 module.exports = {
-  runtime: 'nodejs12.x',
-  runtimeDir: 'nodejs',
-  packageManager: 'yarn',
-  packageManagerExtraArgs: '',
-  libraryFolder: 'node_modules',
-  dependenciesPath: './fixtures/package.json',
+  runtime: "nodejs12.x",
+  runtimeDir: "nodejs",
+  packageManager: "yarn",
+  packageManagerExtraArgs: "",
+  libraryFolder: "node_modules",
+  dependenciesPath: "./fixtures/package.json",
   layerOptimization: {
     cleanupPatterns: [
       "node_modules/@aws-sdk/**", // if using node 18 packages that use @aws-sdk
@@ -37,14 +37,11 @@ module.exports = {
       "node_modules/**/.travis.y*ml",
       "node_modules/**/yarn.lock",
       "node_modules/**/.package-lock.json",
-      "node_modules/**/*.md"
-    ]
+      "node_modules/**/*.md",
+    ],
   },
-  compatibleRuntimes: ['nodejs'],
-  compatibleArchitectures: [
-    "x86_64",
-    "arm64"
-  ],
-  copyBeforeInstall: ['.npmrc', 'yarn.lock', 'package-lock.json'],
-  packagePatterns: ['!node_modules/**']
-}
+  compatibleRuntimes: ["nodejs"],
+  compatibleArchitectures: ["x86_64", "arm64"],
+  copyBeforeInstall: [".npmrc", "yarn.lock", "package-lock.json"],
+  packagePatterns: ["!node_modules/**"],
+};

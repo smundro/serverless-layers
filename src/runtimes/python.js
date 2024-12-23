@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
 class PythonRuntime {
   constructor(parent, runtime, runtimeDir) {
@@ -10,24 +10,21 @@ class PythonRuntime {
     this.default = {
       runtime,
       runtimeDir,
-      libraryFolder: 'site-packages',
-      packageManager: 'pip',
-      packageManagerExtraArgs: '',
-      dependenciesPath: 'requirements.txt',
+      libraryFolder: "site-packages",
+      packageManager: "pip",
+      packageManagerExtraArgs: "",
+      dependenciesPath: "requirements.txt",
       compatibleRuntimes: [runtime],
       compatibleArchitectures: parent.compatibleArchitectures,
       copyBeforeInstall: [],
       packagePatterns: [
-        '!package.json',
-        '!package-lock.json',
-        '!node_modules/**',
+        "!package.json",
+        "!package-lock.json",
+        "!node_modules/**",
       ],
       layerOptimization: {
-        cleanupPatterns: [
-          "node_modules/**/*.pyc",
-          "node_modules/**/*.md",
-        ]
-      }
+        cleanupPatterns: ["node_modules/**/*.pyc", "node_modules/**/*.md"],
+      },
     };
 
     this.commands = {
@@ -35,13 +32,10 @@ class PythonRuntime {
     };
   }
 
-  init () {
+  init() {
     const { dependenciesPath } = this.plugin.settings;
 
-    const localpackageJson = path.join(
-      process.cwd(),
-      dependenciesPath
-    );
+    const localpackageJson = path.join(process.cwd(), dependenciesPath);
 
     try {
       this.localPackage = fs.readFileSync(localpackageJson).toString();
@@ -51,37 +45,43 @@ class PythonRuntime {
     }
   }
 
-  async isCompatibleVersion (runtime) {
-    const osVersion = await this.parent.run('python --version');
+  async isCompatibleVersion(runtime) {
+    const osVersion = await this.parent.run("python --version");
     const [runtimeVersion] = runtime.match(/[0-9].[0-9]/);
     return {
       version: osVersion,
-      isCompatible: osVersion.startsWith(`Python ${runtimeVersion}`)
+      isCompatible: osVersion.startsWith(`Python ${runtimeVersion}`),
     };
   }
 
-  isDiff (depsA, depsB) {
+  isDiff(depsA, depsB) {
     if (!depsA) {
       return true;
     }
     return depsA !== depsB;
   }
 
-  async hasDependenciesChanges () {
-    const remotePackage = await this.plugin.bucketService.downloadDependencesFile();
+  async hasDependenciesChanges() {
+    const remotePackage =
+      await this.plugin.bucketService.downloadDependencesFile();
 
     let isDifferent = true;
 
     if (remotePackage) {
-      this.plugin.log(`Comparing ${this.default.dependenciesPath} dependencies...`);
+      this.plugin.log(
+        `Comparing ${this.default.dependenciesPath} dependencies...`
+      );
       isDifferent = await this.isDiff(remotePackage, this.localPackage);
     }
 
     return isDifferent;
   }
 
-  getDependenciesChecksum () {
-    return crypto.createHash('md5').update(JSON.stringify(this.localPackage)).digest('hex');
+  getDependenciesChecksum() {
+    return crypto
+      .createHash("md5")
+      .update(JSON.stringify(this.localPackage))
+      .digest("hex");
   }
 }
 
