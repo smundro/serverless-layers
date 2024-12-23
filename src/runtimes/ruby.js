@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
 class RubyRuntime {
   constructor(parent, runtime, runtimeDir) {
@@ -10,31 +10,24 @@ class RubyRuntime {
     this.default = {
       runtime,
       runtimeDir,
-      libraryFolder: 'gems',
-      packageManager: 'bundle',
-      packageManagerExtraArgs: '',
-      dependenciesPath: 'Gemfile',
+      libraryFolder: "gems",
+      packageManager: "bundle",
+      packageManagerExtraArgs: "",
+      dependenciesPath: "Gemfile",
       compatibleRuntimes: [runtime],
       compatibleArchitectures: parent.compatibleArchitectures,
-      copyBeforeInstall: [
-        'Gemfile.lock'
-      ],
-      copyAfterInstall: [
-        { from: 'ruby', to: 'gems' }
-      ],
+      copyBeforeInstall: ["Gemfile.lock"],
+      copyAfterInstall: [{ from: "ruby", to: "gems" }],
       packagePatterns: [
-        '!node_modules/**',
-        '!package.json',
-        '!package-lock.json',
-        '!vendor/**',
-        '!.bundle'
+        "!node_modules/**",
+        "!package.json",
+        "!package-lock.json",
+        "!vendor/**",
+        "!.bundle",
       ],
       layerOptimization: {
-        cleanupPatterns: [
-          "node_modules/**/*.pyc",
-          "node_modules/**/*.md",
-        ]
-      }
+        cleanupPatterns: ["node_modules/**/*.pyc", "node_modules/**/*.md"],
+      },
     };
 
     this.commands = {
@@ -42,13 +35,10 @@ class RubyRuntime {
     };
   }
 
-  init () {
+  init() {
     const { dependenciesPath } = this.plugin.settings;
 
-    const localpackageJson = path.join(
-      process.cwd(),
-      dependenciesPath
-    );
+    const localpackageJson = path.join(process.cwd(), dependenciesPath);
 
     try {
       this.localPackage = fs.readFileSync(localpackageJson).toString();
@@ -58,37 +48,43 @@ class RubyRuntime {
     }
   }
 
-  async isCompatibleVersion (runtime) {
-    const osVersion = await this.parent.run('ruby --version');
+  async isCompatibleVersion(runtime) {
+    const osVersion = await this.parent.run("ruby --version");
     const [runtimeVersion] = runtime.match(/[0-9].[0-9]/);
     return {
       version: osVersion,
-      isCompatible: osVersion.startsWith(`ruby ${runtimeVersion}`)
+      isCompatible: osVersion.startsWith(`ruby ${runtimeVersion}`),
     };
   }
 
-  isDiff (depsA, depsB) {
+  isDiff(depsA, depsB) {
     if (!depsA) {
       return true;
     }
     return depsA !== depsB;
   }
 
-  async hasDependenciesChanges () {
-    const remotePackage = await this.plugin.bucketService.downloadDependencesFile();
+  async hasDependenciesChanges() {
+    const remotePackage =
+      await this.plugin.bucketService.downloadDependencesFile();
 
     let isDifferent = true;
 
     if (remotePackage) {
-      this.plugin.log(`Comparing ${this.default.dependenciesPath} dependencies...`);
+      this.plugin.log(
+        `Comparing ${this.default.dependenciesPath} dependencies...`
+      );
       isDifferent = await this.isDiff(remotePackage, this.localPackage);
     }
 
     return isDifferent;
   }
 
-  getDependenciesChecksum () {
-    return crypto.createHash('md5').update(JSON.stringify(this.localPackage)).digest('hex');
+  getDependenciesChecksum() {
+    return crypto
+      .createHash("md5")
+      .update(JSON.stringify(this.localPackage))
+      .digest("hex");
   }
 }
 
