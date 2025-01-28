@@ -21,7 +21,7 @@ class AbstractService {
     }
   }
 
-  async awsRequest(serviceAction, params, opts={}) {
+  async awsRequest(serviceAction, params, opts = {}) {
     const [service, action] = serviceAction.split(':');
     if (!opts.checkError) {
       return this.provider.request(service, action, params);
@@ -30,11 +30,11 @@ class AbstractService {
     try {
       const resp = await this.provider.request(service, action, params);
       return resp;
-    }catch(e) {
-      console.log(chalk.red(`ServerlessLayers error:`));
+    } catch (e) {
+      console.log(chalk.red('ServerlessLayers error:'));
       console.log(`    Action: ${serviceAction}`);
       console.log(`    Params: ${JSON.stringify(params)}`);
-      console.log(chalk.red(`AWS SDK error:`));
+      console.log(chalk.red('AWS SDK error:'));
       console.log(`    ${e.message}`);
       process.exit(1);
     }
@@ -42,8 +42,8 @@ class AbstractService {
 
   getLayerPackageDir() {
     const { compileDir, runtimeDir } = this.plugin.settings;
-    return path.join(process.cwd(), compileDir, 'layers', runtimeDir);;
+    return path.join(process.cwd(), compileDir, 'layers', runtimeDir);
   }
 }
 
-module.exports = AbstractService
+module.exports = AbstractService;

@@ -21,7 +21,7 @@ function resolveFile(from, opts = {}) {
 class Dependencies extends AbstractService {
   init() {
     this.layersPackageDir = this.getLayerPackageDir();
-    fs.rmSync(this.layersPackageDir, {force: true, recursive: true});
+    // fs.rmSync(this.layersPackageDir, { force: true, recursive: true });
     return mkdirp.sync(this.layersPackageDir);
   }
 
@@ -48,16 +48,16 @@ class Dependencies extends AbstractService {
      *
      * Reference: https://www.serverless.com/framework/docs/providers/aws/guide/packaging
      */
-    for (let pattern of this.plugin.settings.layerOptimization.cleanupPatterns) {
+    for (const pattern of this.plugin.settings.layerOptimization.cleanupPatterns) {
       if (pattern.startsWith('!')) {
         const resolvedFiles = await resolveFile(pattern.substr(1), {
-          cwd: this.layersPackageDir
+          cwd: this.layersPackageDir,
         });
         filesToIgnore = filesToIgnore.concat(resolvedFiles);
       } else {
         // change directory
         const resolvedFiles = await resolveFile(pattern, {
-          cwd: this.layersPackageDir
+          cwd: this.layersPackageDir,
         });
         filesToExclude = filesToExclude.concat(resolvedFiles);
       }
@@ -65,11 +65,11 @@ class Dependencies extends AbstractService {
 
     filesToExclude.forEach((filename) => {
       // check if folder or files are being ignored, and shouldn't be removed.
-      const shouldBeIgnored = filesToIgnore.filter(x => x.startsWith(filename)).length > 0;
+      const shouldBeIgnored = filesToIgnore.filter((x) => x.startsWith(filename)).length > 0;
 
       if (!shouldBeIgnored) {
         this.plugin.warn(`[layerOptimization.cleanupPatterns] Ignored: ${filename}`);
-        fs.rmSync(path.join(this.layersPackageDir, filename), {force: true, recursive: true});
+        fs.rmSync(path.join(this.layersPackageDir, filename), { force: true, recursive: true });
       }
     });
   }
@@ -78,7 +78,7 @@ class Dependencies extends AbstractService {
     const output = execSync(cmd, {
       cwd: this.layersPackageDir,
       env: process.env,
-      maxBuffer: 1024 * 1024 * 500
+      maxBuffer: 1024 * 1024 * 500,
     }).toString();
     return output;
   }
@@ -128,7 +128,7 @@ class Dependencies extends AbstractService {
       console.log(chalk.white(await this.run(this.plugin.settings.customInstallationCommand)));
     } else {
       const commands = this.plugin.runtimes.getCommands();
-      const {packageManagerExtraArgs, packageManager} = this.plugin.settings;
+      const { packageManagerExtraArgs, packageManager } = this.plugin.settings;
       const installCommand = `${commands[packageManager]} ${packageManagerExtraArgs}`;
       this.plugin.log(chalk.white.bold(installCommand));
       console.log(chalk.white(await this.run(installCommand)));
@@ -151,9 +151,12 @@ class Dependencies extends AbstractService {
     // cleanup files
     try {
       await this.excludePatternFiles();
-    } catch(err) {
+    } catch (err) {
       if (!this.plugin.service.package.patterns) {
-        this.plugin.warn(`[warning] package.patterns option is not set. @see https://www.serverless.com/framework/docs/providers/aws/guide/packaging`);
+        this.plugin.warn(
+          `[warning] package.patterns option is not set. 
+          @see https://www.serverless.com/framework/docs/providers/aws/guide/packaging`,
+        );
       } else {
         console.error(err);
         process.exit(1);
