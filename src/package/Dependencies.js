@@ -21,6 +21,10 @@ function resolveFile(from, opts = {}) {
 class Dependencies extends AbstractService {
   init() {
     this.layersPackageDir = this.getLayerPackageDir();
+    // this line appears to just cleanup the package directory before building?
+    // but result is a lambda API issue possibly related to node20?
+    // https://github.com/agutoli/serverless-layers/issues/163
+    // https://github.com/agutoli/serverless-layers/issues/166
     // fs.rmSync(this.layersPackageDir, { force: true, recursive: true });
     return mkdirp.sync(this.layersPackageDir);
   }
