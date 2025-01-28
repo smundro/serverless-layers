@@ -3,7 +3,7 @@ service: local-folders-layers
 provider:
   name: aws
   region: us-east-1
-  runtime: nodejs12.x
+  runtime: nodejs20.x
   deploymentBucket:
     name: your-bucket
 
@@ -16,7 +16,7 @@ custom:
           path: ./myLocalLibSource
           folders:
             include:
-              - '*.js'
+              - "*.js"
             exclude:
               - node_modules
 

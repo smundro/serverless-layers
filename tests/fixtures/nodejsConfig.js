@@ -1,5 +1,5 @@
 module.exports = {
-  runtime: "nodejs12.x",
+  runtime: "nodejs20.x",
   runtimeDir: "nodejs",
   packageManager: "yarn",
   packageManagerExtraArgs: "",
