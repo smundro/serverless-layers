@@ -4,13 +4,13 @@
   "description": "",
   "main": "src/index.js",
   "bugs": {
-    "url": "https://github.com/agutoli/serverless-layers/issues"
+    "url": "https://github.com/smundro/serverless-layers/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/agutoli/serverless-layers.git"
+    "url": "git+https://github.com/smundro/serverless-layers.git"
   },
-  "homepage": "https://github.com/agutoli/serverless-layers",
+  "homepage": "https://github.com/smundro/serverless-layers",
   "scripts": {
     "build": "BABEL_ENV=production ./bin/build",
     "test": "NODE_ENV=test NODE_PATH=./src mocha 'tests/**/*.test.js' --colors --reporter spec -unhandled-rejections=strict",
